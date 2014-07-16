@@ -60,6 +60,10 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
     name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
 ))
 
+# Allow us to call _from_deprecated_(son|string) throughout the file
+# pylint: disable=protected-access
+
+
 class MongoRevisionKey(object):
     """
     Key Revision constants to use for Location and Usage Keys in the Mongo modulestore
@@ -1248,8 +1252,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             {'_id.category': 'course', 'definition.data.wiki_slug': wiki_slug},
             {'_id': True}
         )
-        # the course's run == its name. It's the only xblock for which that's necessarily true.
-        return [Location._from_deprecated_son(course['_id'], course['_id']['name']) for course in courses]
+        results = []
+        for course in courses:
+            # the course's run == its name. It's the only xblock for which that's necessarily true.
+            loc = Location._from_deprecated_son(course['_id'], course['_id']['name'])
+            results.append(loc.course_key)
+        return results
 
     def _create_new_field_data(self, _category, _location, definition_data, metadata):
         """

@@ -1893,7 +1893,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             {'search_targets.{}'.format(field_name): field_value}
         )
         return [
-            CourseLocator(entry['org'], entry['course'], entry['run'])  # which branch? TODO
+            CourseLocator(entry['org'], entry['course'], entry['run'])  # TODO: which branch needs to be specified?
             for entry in entries
         ]
 
