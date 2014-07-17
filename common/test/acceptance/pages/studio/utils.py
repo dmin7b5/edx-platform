@@ -1,7 +1,7 @@
 """
 Utility methods useful for Studio page tests.
 """
-from bok_choy.promise import Promise, EmptyPromise
+from bok_choy.promise import EmptyPromise
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -71,18 +71,26 @@ def add_advanced_component(page, menu_index, name):
     menu_index specifies which instance of the menus should be used (based on vertical
     placement within the page).
     """
+    # Click on the Advanced icon.
     click_css(page, 'a>span.large-advanced-icon', menu_index, require_notification=False)
 
     # Sporadically, the advanced component was not getting created after the click_css call on the category (below).
     # Try making sure that the menu of advanced components is visible before clicking (the HTML is always on the
     # page, but will have display none until the large-advanced-icon is clicked).
-    def is_advanced_components_showing():
-        advanced_buttons = page.q(css=".new-component-advanced").filter(lambda el: el.size['width'] > 0)
-        return (len(advanced_buttons) == 1, len(advanced_buttons))
+    EmptyPromise(lambda: page.q(css='.new-component-advanced').visible,
+        'Advanced component menu is visible').fulfill()
 
-    Promise(is_advanced_components_showing, "Advanced component menu not showing").fulfill()
+    # Now click on the component to add it.
+    component_css = 'a[data-category={}]'.format(name)
 
-    click_css(page, 'a[data-category={}]'.format(name))
+    EmptyPromise(
+        lambda: page.q(css=component_css).visible,
+        'Advanced component {} is visible'.format(name)
+    ).fulfill()
+
+    # Click the confirmation dialog button
+    page.q(css=component_css).first.click()
+    wait_for_notification(page)
 
 
 def type_in_codemirror(page, index, text, find_prefix="$"):
