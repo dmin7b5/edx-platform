@@ -84,6 +84,7 @@ def add_advanced_component(page, menu_index, name):
     page.wait_for_element_visibility(component_css, 'Advanced component {} is visible'.format(name))
 
     # Click the component to add it.
+    page.wait_for_ajax()
     page.q(css=component_css).first.click()
     wait_for_notification(page)
 
