@@ -77,18 +77,13 @@ def add_advanced_component(page, menu_index, name):
     # Sporadically, the advanced component was not getting created after the click_css call on the category (below).
     # Try making sure that the menu of advanced components is visible before clicking (the HTML is always on the
     # page, but will have display none until the large-advanced-icon is clicked).
-    EmptyPromise(lambda: page.q(css='.new-component-advanced').visible,
-        'Advanced component menu is visible').fulfill()
+    page.wait_for_element_visibility('.new-component-advanced', 'Advanced component menu is visible')
 
     # Now click on the component to add it.
     component_css = 'a[data-category={}]'.format(name)
+    page.wait_for_element_visibility(component_css, 'Advanced component {} is visible'.format(name))
 
-    EmptyPromise(
-        lambda: page.q(css=component_css).visible,
-        'Advanced component {} is visible'.format(name)
-    ).fulfill()
-
-    # Click the confirmation dialog button
+    # Click the component to add it.
     page.q(css=component_css).first.click()
     wait_for_notification(page)
 
