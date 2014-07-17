@@ -14,6 +14,12 @@ def click_css(page, css, source_index=0, require_notification=True):
     Otherwise, it will wait for the "mini-notification" to appear and disappear.
     """
     page.q(css=css).filter(lambda el: el.size['width'] > 0).nth(source_index).click()
+
+    # Some buttons trigger ajax posts
+    # (e.g. .add-missing-groups-button as configured in split_test_author_view.js)
+    # so after you click it wait for the ajax call to finish
+    page.wait_for_ajax()
+
     if require_notification:
         wait_for_notification(page)
 
