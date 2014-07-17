@@ -1,7 +1,7 @@
 """
 Utility methods useful for Studio page tests.
 """
-from bok_choy.promise import Promise
+from bok_choy.promise import Promise, EmptyPromise
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -23,15 +23,13 @@ def wait_for_notification(page):
     Waits for the "mini-notification" to appear and disappear on the given page (subclass of PageObject).
     """
     def _is_saving():
-        num_notifications = page.q(css='.wrapper-notification-mini.is-shown').present
-        return (num_notifications == 1, num_notifications)
+        return page.q(css='.wrapper-notification-mini.is-shown').present
 
     def _is_saving_done():
-        num_notifications = page.q(css='.wrapper-notification-mini.is-hiding').present
-        return (num_notifications == 1, num_notifications)
+        return page.q(css='.wrapper-notification-mini.is-hiding').present
 
-    Promise(_is_saving, 'Notification should have been shown.', timeout=60).fulfill()
-    Promise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
+    EmptyPromise(_is_saving, 'Notification should have been shown.', timeout=60).fulfill()
+    EmptyPromise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
 
 
 def press_the_notification_button(page, name):
