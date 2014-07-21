@@ -1904,7 +1904,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
-        :return: list of course locations
+        :return: list of course keys
         """
         return self.find_courses_by_search_target('wiki_slug', wiki_slug)
 

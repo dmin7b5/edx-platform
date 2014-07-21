@@ -1246,7 +1246,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
-        :return: list of course locations
+        :return: list of course keys
         """
         courses = self.collection.find(
             {'_id.category': 'course', 'definition.data.wiki_slug': wiki_slug},
