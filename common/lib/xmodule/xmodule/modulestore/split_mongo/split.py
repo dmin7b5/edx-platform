@@ -1077,6 +1077,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 self.db_connection.insert_structure(draft_structure)
                 versions_dict[master_branch] = new_id
 
+        if fields is not None:
+            search_targets = (search_targets or {}).update(self._create_search_targets(fields))
+
         index_entry = {
             '_id': ObjectId(),
             'org': org,
@@ -1088,12 +1091,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'schema_version': self.SCHEMA_VERSION,
             'search_targets': search_targets or {},
         }
-        if fields is not None:
-            self._update_search_targets(index_entry, fields)
+
         self.db_connection.insert_course_index(index_entry)
-        # expensive hack to persist default field values set in __init__ method (e.g., wiki_slug)
-        course = self.get_course(locator)
-        return self.update_item(course, user_id)
+        return self.get_course(locator)
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
         """
@@ -1687,9 +1687,21 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param fields: a dictionary of fields and values usually only those explicitly set and already
             ready for persisting (e.g., references converted to block_ids)
         """
+        index_entry['search_targets'] = self._create_search_targets(fields)
+
+    def _create_search_targets(self, fields):
+        """
+        Update the index entry if any of the given fields are in SEARCH_TARGET_DICT. (doesn't save
+        the changes, just changes them in the entry dict)
+        :param index_entry:
+        :param fields: a dictionary of fields and values usually only those explicitly set and already
+            ready for persisting (e.g., references converted to block_ids)
+        """
+        search_targets = {}
         for field_name, field_value in fields.iteritems():
             if field_name in self.SEARCH_TARGET_DICT:
-                index_entry.setdefault('search_targets', {})[field_name] = field_value
+                search_targets[field_name] = field_value
+        return search_targets
 
     def _update_head(self, index_entry, branch, new_id):
         """
