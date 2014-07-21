@@ -660,7 +660,7 @@ class TestMixedModuleStore(unittest.TestCase):
         wiki_courses = self.store.get_courses_for_wiki('999')
         self.assertEqual(len(wiki_courses), 1)
         self.assertIn(
-            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),  # Branch agnostic
             wiki_courses
         )
 
@@ -757,7 +757,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # verify initial state - initially, we should have a wiki for the Mongo course
         wiki_courses = self.store.get_courses_for_wiki('999')
         self.assertIn(
-            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),  # Branch agnostic
             wiki_courses
         )
 
@@ -788,6 +788,17 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(wiki_courses), 1)
         self.assertIn(
             self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            wiki_courses
+        )
+        # and NOT retriveable with its old wiki_slug
+        wiki_courses = self.store.get_courses_for_wiki('simple')
+        self.assertEqual(len(wiki_courses), 1)
+        self.assertNotIn(
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            wiki_courses
+        )
+        self.assertIn(
+            self.course_locations[self.XML_COURSEID2].course_key,
             wiki_courses
         )
 

@@ -263,9 +263,14 @@ class CourseTestCase(ModuleStoreTestCase):
                 )
             except AssertionError:
                 # old mongo calls things draft if draft exists even if it's != published; so, do more work
+                c1_state = self.compute_real_state(course1_item)
+                c2_state = self.compute_real_state(course2_item)
                 self.assertEqual(
-                    self.compute_real_state(course1_item),
-                    self.compute_real_state(course2_item)
+                    c1_state,
+                    c2_state,
+                    "Course item {} in state {} != course item {} in state {}".format(
+                        course1_item, c1_state, course2_item, c2_state
+                    )
                 )
 
             # compare data
