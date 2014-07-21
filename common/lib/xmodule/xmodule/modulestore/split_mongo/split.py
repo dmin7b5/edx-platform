@@ -1902,13 +1902,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         Find all the courses which cached that they have the given field with the given value.
 
-        Returns: list of course_keys
+        Returns: list of branch-agnostic course_keys
         """
         entries = self.db_connection.find_matching_course_indexes(
             {'search_targets.{}'.format(field_name): field_value}
         )
         return [
-            CourseLocator(entry['org'], entry['course'], entry['run'])  # TODO: which branch needs to be specified?
+            CourseLocator(entry['org'], entry['course'], entry['run'])  # Branch agnostic
             for entry in entries
         ]
 
