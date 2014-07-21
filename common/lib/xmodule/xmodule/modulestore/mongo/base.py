@@ -1252,12 +1252,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             {'_id.category': 'course', 'definition.data.wiki_slug': wiki_slug},
             {'_id': True}
         )
-        results = []
-        for course in courses:
-            # the course's run == its name. It's the only xblock for which that's necessarily true.
-            loc = Location._from_deprecated_son(course['_id'], course['_id']['name'])
-            results.append(loc.course_key)
-        return results
+        # the course's run == its name. It's the only xblock for which that's necessarily true.
+        return [
+            Location._from_deprecated_son(course['_id'], course['_id']['name']).course_key
+            for course in courses
+        ]
 
     def _create_new_field_data(self, _category, _location, definition_data, metadata):
         """
